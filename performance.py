@@ -1,29 +1,23 @@
-from typing import Union
+from typing import Union, Sequence
 
 import numpy as np
-import pandas as pd
 from sklearn.metrics import mean_squared_error
 
 
 # TODO: Implement detection time error.
-def measure_detection_time_error(predicted_time: int, video_name: str, io: pd.ExcelFile,
-                                 sheet_name: str) -> Union[float, np.ndarray]:
-    """Calculate detection time error of the traffic anomaly detector.
+def measure_detection_time_error(y_true: Sequence[int], y_pred: Sequence[int]) -> float:
+    """Calculate detection time error of the traffic anomaly detector of a video.
 
     Parameters
     ----------
-    predicted_time : int
+    y_true : array_like
+      Ground-truth time in seconds.
+    y_pred : array_like
       Predicted time in seconds.
-    io : pandas.ExcelFile
-      Excel file source where the video is recorded.
-    video_name : str
-      Filename video corresponding to the video tested.
-    sheet_name : str
-      Sheet name where the `video_name` of `io` is recorded.
 
     Returns
     -------
-    float, numpy.ndarray
+    float
       Normalized Root Mean Square Error.
 
     Notes
@@ -41,10 +35,7 @@ def measure_detection_time_error(predicted_time: int, video_name: str, io: pd.Ex
     .. [1] Milind Naphade; Shuo Wang; David C. Anastasiu; Ming-Ching Chang; Liang Zheng; Anuj Sharma; Rama Chellappa;
            Pranamesh Chakraborty; Zheng Tang; Xiaodong Yang "The 4th AI City Challenge", page 6, 2020.
     """
-    df = pd.read_excel(io, sheet_name)
-    cols = ["Video Name", "Pre collission [sec]", "Collission [sec]", "Post collission [sec]"]
-    df = df.loc(df[cols[0]] == video_name)
-    nrmse = min(mean_squared_error(y_true=df[cols[1]], y_pred=predicted_time, squared=False), 300) / 300
+    nrmse = min(mean_squared_error(y_true=y_true, y_pred=y_pred, squared=False), 300) / 300
     return nrmse
 
 
